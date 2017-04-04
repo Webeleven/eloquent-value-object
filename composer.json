@@ -1,0 +1,28 @@
+{
+  "name": "felipeweb11/eloquent-value-object",
+  "description": "Value objects for larvel eloquent.",
+  "keywords": ["laravel", "eloquent", "value object", "attribute", "mutator"],
+  "homepage": "https://github.com/felipeweb11/eloquent-value-object",
+  "require": {
+    "php": ">=5.4.0",
+    "illuminate/support": "^5.1"
+  },
+  "require-dev": {
+    "phpunit/phpunit" : "^5.7.0"
+  },
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "Webeleven\\EloquentValueObject\\": "src/"
+    },
+    "classmap": [
+      "tests"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Felipe",
+      "email": "felipe.ralc@gmail.com"
+    }
+  ]
+}
