@@ -10,6 +10,11 @@ trait CastsValueObjects
      */
     protected $cachedObjects = [];
 
+    /**
+     * @var array
+     */
+    protected $oldValueObjectsAttributes = [];
+
     public static function bootCastsValueObjects()
     {
         static::saving(function($model) {
@@ -63,17 +68,25 @@ trait CastsValueObjects
      */
     public function setAttribute($key, $value)
     {
-        if (! $this->isValueObject($key)) {
+        if (! $this->isValueObject($key) || empty($value)) {
             return parent::setAttribute($key, $value);
         }
 
-        if (! $value instanceof ValueObject) {
+        $old = $this->getAttribute($key);
+
+        $this->invalidateValueObjectCache($key);
+
+        if (! $value instanceof ValueObjectInterface) {
             $value = $this->createValueObject($key, $value);
         }
 
         // We'll need to cast value object to a scalar
         // and then let it be set into Eloquent's attributes array.
         parent::setAttribute($key, $scalar = $value->toScalar());
+
+        $this->storeOldValueObjectAttribute($key, $old);
+
+        event('easymutators.new-attribute-set', [$key, $value, $old, $this]);
 
         // If the value wasn't modified during the set process
         // store the original ValueObject in our cache.
@@ -120,10 +133,10 @@ trait CastsValueObjects
 
     /**
      * @param string $key
-     * @param ValueObject $object
+     * @param ValueObjectInterface $object
      * @return $this
      */
-    private function cacheValueObject($key, ValueObject $object)
+    private function cacheValueObject($key, $object)
     {
         $this->cachedObjects[$key] = $object;
         return $this;
@@ -152,11 +165,25 @@ trait CastsValueObjects
     /**
      * @param string $key
      *
-     * @return ValueObject
+     * @return ValueObjectInterface
      */
     private function getCachedValueObject($key)
     {
         return $this->cachedObjects[$key];
+    }
+
+    public function getOldValueObjectsAttributes()
+    {
+        return $this->oldValueObjectsAttributes;
+    }
+
+    public function storeOldValueObjectAttribute($key, $value)
+    {
+        if (! isset($this->oldValueObjectsAttributes[$key])) {
+            $this->oldValueObjectsAttributes[$key] = [];
+        }
+
+        $this->oldValueObjectsAttributes[$key][] = $value;
     }
 
 }

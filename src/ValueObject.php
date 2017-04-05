@@ -2,22 +2,12 @@
 
 namespace Webeleven\EloquentValueObject;
 
-use Illuminate\Contracts\Support\Arrayable;
-
-interface ValueObject extends Arrayable
+abstract class ValueObject implements ValueObjectInterface
 {
-    /**
-     * @param $value
-     */
-    public function __construct($value);
 
-    /**
-     * @return mixed
-     */
-    public function toScalar();
+    public static function make($value = null)
+    {
+        return new static($value);
+    }
 
-    /**
-     * @return string
-     */
-    public function __toString();
 }
