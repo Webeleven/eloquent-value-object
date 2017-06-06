@@ -24,7 +24,10 @@ trait CastsValueObjects
             if (count($objects)) {
                 foreach ($objects as $key => $value) {
                     if (isset($model->{$key})) {
-                        $model->attributes[$key] = $model->{$key}->__tostring();
+                    
+                        $value = (string) $model->{$key};
+
+                        $model->attributes[$key] = ! empty($value) ? $value : null;
                     }
                 }
             }
